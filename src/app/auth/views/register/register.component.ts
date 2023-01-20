@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -16,13 +17,13 @@ export class RegisterComponent implements OnInit {
   });
 
 
-  constructor(private _fb: FormBuilder) { }
+  constructor(private _fb: FormBuilder, private _router: Router) { }
 
   ngOnInit(): void {
   }
 
   register(){
     console.log(this.registerForm.value);
-    console.log(this.registerForm.valid);
+    this._router.navigateByUrl('/dashboard');
   }
 }
