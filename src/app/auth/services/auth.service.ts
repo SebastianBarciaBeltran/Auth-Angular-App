@@ -26,7 +26,9 @@ export class AuthService {
 
     return this._http.post<AuthResponse>(url, body).pipe(
       tap( response =>{ 
-        return this.checkResponseAndCreateSessionStorage(response)
+        if (response.ok) {
+          sessionStorage.setItem('token', response.token!)
+        }
       }),
       map( response => response.ok ),
       catchError( error => of(error.error.msg) )
@@ -40,8 +42,10 @@ export class AuthService {
     const body = { name, email, password }
 
     return this._http.post<AuthResponse>(url, body).pipe(
-        tap( response =>{
-          return this.checkResponseAndCreateSessionStorage(response)
+        tap( ({ok, token}) =>{
+          if (ok) {
+            sessionStorage.setItem('token', token!)
+          }
         }),
         map( response => response.ok ),
         catchError( error => of(error.error.msg))
@@ -55,21 +59,18 @@ export class AuthService {
     const headers = new HttpHeaders().set('x-token', sessionStorage.getItem('token') || '');
 
     return this._http.get<AuthResponse>(url, { headers })
-            .pipe(
-              map( (response) => {
-                  return this.checkResponseAndCreateSessionStorage(response)
-                }),
-                catchError(error => of(false))
-
-            )
-  }
-
-  checkResponseAndCreateSessionStorage( response: AuthResponse ): boolean {
-     if(response.ok){
-          sessionStorage.setItem('token', response.token!)
-          this._user = { name: response.name!, uid: response.uid!};
-     }
-     return response.ok
+               .pipe(
+                  map(({ok, ...response}) => {
+                      sessionStorage.setItem('token', response.token!)
+                      this._user = { 
+                        name: response.name!, 
+                        uid: response.uid!, 
+                        email: response.email!
+                      };
+                      return ok
+                  }),
+                  catchError(error => of(false))
+               )
   }
 
   logout():void {
