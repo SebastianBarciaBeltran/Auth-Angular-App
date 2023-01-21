@@ -17,7 +17,8 @@ import { RegisterComponent } from './views/register/register.component';
   imports: [
     CommonModule,
     AuthRoutingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+
   ],
   exports:[],
   providers: []
