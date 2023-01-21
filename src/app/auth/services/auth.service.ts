@@ -20,7 +20,7 @@ export class AuthService {
 
   constructor( private _http: HttpClient) { }
 
-  login(email: string, password: string) {
+  login(email: string, password: string): Observable<any> {
     const url = `${this._baseUrl}/login`
     const body = { email, password };
 
@@ -32,6 +32,21 @@ export class AuthService {
       catchError( error => of(error.error.msg) )
 
     );
+  }
+
+  register(name: string, email: string, password: string): Observable<any>{
+
+    const url = `${this._baseUrl}/new`;
+    const body = { name, email, password }
+
+    return this._http.post<AuthResponse>(url, body).pipe(
+        tap( response =>{
+          return this.checkResponseAndCreateSessionStorage(response)
+        }),
+        map( response => response.ok ),
+        catchError( error => of(error.error.msg))
+    )
+
   }
 
 
@@ -54,10 +69,8 @@ export class AuthService {
           sessionStorage.setItem('token', response.token!)
           this._user = { name: response.name!, uid: response.uid!};
      }
-
      return response.ok
   }
-
 
   logout():void {
     sessionStorage.removeItem('token');
