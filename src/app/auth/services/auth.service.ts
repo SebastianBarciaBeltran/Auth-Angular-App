@@ -57,5 +57,11 @@ export class AuthService {
 
      return response.ok
   }
+
+
+  logout():void {
+    sessionStorage.removeItem('token');
+  }
+
 }
 
